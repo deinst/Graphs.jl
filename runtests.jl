@@ -1,4 +1,4 @@
-
+module GraphsTestSuite
 tests = [
     "edgelist",
     "adjlist",
@@ -23,4 +23,4 @@ for t in tests
     println("running $(tp) ...")
     include(tp)
 end
-
+end
