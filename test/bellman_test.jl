@@ -42,9 +42,14 @@ immutable MyEdge{V}
     target::V
     dist::Float64
 end
-Graphs.target{V}(e::MyEdge{V}, g::AbstractGraph{V}) = e.target
-Graphs.source{V}(e::MyEdge{V}, g::AbstractGraph{V}) = e.source
-Graphs.edge_index(e::MyEdge) = e.index
+
+import Graphs.source
+import Graphs.target
+import Graphs.edge_index
+target{V}(g::AbstractGraph{V}, e::MyEdge{V}) = e.target
+source{V}(g::AbstractGraph{V}, e::MyEdge{V}) = e.source
+edge_index(e::MyEdge) = e.index
+
 g2 = inclist([i for i=1:10], MyEdge{Int})
 
 for i = 2:10

@@ -20,7 +20,7 @@ function breadth_first_visit_impl!(
         open_vertex!(visitor, u)
 
         for v in out_neighbors(u, graph)
-            vi = vertex_index(v, graph)
+            vi = vertex_index(graph, v)
             v_color::Int = colormap[vi]
             # TODO: Incorporate edge colors to BFS
             examine_neighbor!(visitor, u, v, v_color, -1)
@@ -34,7 +34,7 @@ function breadth_first_visit_impl!(
             end
         end
 
-        colormap[vertex_index(u, graph)] = 2
+        colormap[vertex_index(graph, u)] = 2
         close_vertex!(visitor, u)
     end
     nothing
@@ -52,7 +52,7 @@ function traverse_graph{V,E}(
 
     que = Queue(V)
 
-    colormap[vertex_index(s, graph)] = 1
+    colormap[vertex_index(graph, s)] = 1
     if !discover_vertex!(visitor, s)
         return
     end
@@ -74,7 +74,7 @@ function traverse_graph{V,E}(
     que = Queue(V)
 
     for s in sources
-        colormap[vertex_index(s, graph)] = 1
+        colormap[vertex_index(graph, s)] = 1
         if !discover_vertex!(visitor, s)
             return
         end
@@ -104,13 +104,13 @@ function examine_neighbor!(visitor::GDistanceVisitor, u, v, vcolor::Int, ecolor:
     if vcolor == 0
         g = visitor.graph
         dists = visitor.dists
-        dists[vertex_index(v, g)] = dists[vertex_index(u, g)] + 1
+        dists[vertex_index(g, v)] = dists[vertex_index(g, u)] + 1
     end
 end
 
 function gdistances!{V,E,DMap}(graph::AbstractGraph{V,E}, s::V, dists::DMap)
     visitor = GDistanceVisitor(graph, dists)
-    dists[vertex_index(s, graph)] = 0
+    dists[vertex_index(graph, s)] = 0
     traverse_graph(graph, BreadthFirst(), s, visitor)
     dists
 end
@@ -118,7 +118,7 @@ end
 function gdistances!{V,E,DMap}(graph::AbstractGraph{V,E}, sources::AbstractVector{V}, dists::DMap)
     visitor = GDistanceVisitor(graph, dists)
     for s in sources
-        dists[vertex_index(s, graph)] = 0
+        dists[vertex_index(graph, s)] = 0
     end
     traverse_graph(graph, BreadthFirst(), sources, visitor)
     dists

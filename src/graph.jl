@@ -56,13 +56,15 @@ num_edges(g::GenericGraph) = length(g.edges)
 edges(g::GenericGraph) = g.edges
 
 vertex_index{V<:ProvidedVertexType}(v::V, g::GenericGraph{V}) = vertex_index(v)
+vertex_index{V<:ProvidedVertexType}(g::GenericGraph{V}, v::V) = vertex_index(v)
+@deprecate vertex_index{V<:ProvidedVertexType}(v::V,g::GenericGraph{V}) vertex_index(g,v)
 edge_index{V,E}(e::E, g::GenericGraph{V,E}) = edge_index(e)
 
-out_edges{V}(v::V, g::GenericGraph{V}) = g.finclist[vertex_index(v, g)]
+out_edges{V}(v::V, g::GenericGraph{V}) = g.finclist[vertex_index(g, v)]
 out_degree{V}(v::V, g::GenericGraph{V}) = length(out_edges(v, g))
 out_neighbors{V}(v::V, g::GenericGraph{V}) = TargetIterator(g, out_edges(v, g))
 
-in_edges{V}(v::V, g::GenericGraph{V}) = g.binclist[vertex_index(v, g)]
+in_edges{V}(v::V, g::GenericGraph{V}) = g.binclist[vertex_index(g, v)]
 in_degree{V}(v::V, g::GenericGraph{V}) = length(in_edges(v, g))
 in_neighbors{V}(v::V, g::GenericGraph{V}) = SourceIterator(g, in_edges(v, g))
 
@@ -79,8 +81,8 @@ add_vertex!{V}(g::GenericGraph{V}, x) = add_vertex!(g, make_vertex(g, x))
 
 function add_edge!{V,E}(g::GenericGraph{V,E}, u::V, v::V, e::E)
     # add an edge e between u and v
-    ui = vertex_index(u, g)::Int
-    vi = vertex_index(v, g)::Int
+    ui = vertex_index(g, u)::Int
+    vi = vertex_index(g, v)::Int
 
     push!(g.edges, e)
     push!(g.finclist[ui], e)
@@ -94,6 +96,6 @@ function add_edge!{V,E}(g::GenericGraph{V,E}, u::V, v::V, e::E)
     e
 end
 
-add_edge!{V,E}(g::GenericGraph{V,E}, e::E) = add_edge!(g, source(e, g), target(e, g), e)
+add_edge!{V,E}(g::GenericGraph{V,E}, e::E) = add_edge!(g, source(g, e), target(g, e), e)
 add_edge!{V,E}(g::GenericGraph{V,E}, u::V, v::V) = add_edge!(g, u, v, make_edge(g, u, v))
 

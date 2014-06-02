@@ -94,7 +94,7 @@ end
 ###################################################################
 
 function set_source!{V,D}(state::DijkstraStates{V,D}, g::AbstractGraph{V}, s::V)
-    i = vertex_index(s, g)
+    i = vertex_index(g, s)
     state.parents[i] = s
     state.dists[i] = 0
     state.colormap[i] = 2
@@ -114,8 +114,8 @@ function process_neighbors!{V,D,Heap,H}(
     dv::D = zero(D)
 
     for e in out_edges(u, graph)
-        v::V = target(e, graph)
-        iv::Int = vertex_index(v, graph)
+        v::V = target(graph, e)
+        iv::Int = vertex_index(graph, v)
         v_color::Int = colormap[iv]
 
         if v_color == 0
@@ -187,7 +187,7 @@ function dijkstra_shortest_paths!{V, D, Heap, H}(
         u::V = entry.vertex
         du::D = entry.dist
 
-        ui = vertex_index(u, graph)
+        ui = vertex_index(graph, u)
         colormap[ui] = 2
         if !include_vertex!(visitor, parents[ui], u, du)
             return state

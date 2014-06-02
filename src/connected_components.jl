@@ -15,7 +15,7 @@ function connected_components{V}(graph::AbstractGraph{V})
     components = Array(Vector{V}, 0)
 
     for v in vertices(graph)
-        if cmap[vertex_index(v, graph)] == 0
+        if cmap[vertex_index(graph, v)] == 0
             visitor = VertexListVisitor{V}(0)
             traverse_graph(graph, BreadthFirst(), v, visitor, colormap=cmap)
             push!(components, visitor.vertices)
@@ -50,7 +50,7 @@ function strongly_connected_components_recursive{V}(graph::AbstractGraph{V})
     components   = Array(Vector{V}, 0)
 
     function strongconnect(v)
-        v_idx = vertex_index(v, graph)
+        v_idx = vertex_index(graph, v)
         indices[v_idx]  = preorder_idx
         lowlinks[v_idx] = preorder_idx
         preorder_idx   += 1
@@ -58,7 +58,7 @@ function strongly_connected_components_recursive{V}(graph::AbstractGraph{V})
 
         # consider successors of v
         for w in out_neighbors(v, graph)
-            w_idx = vertex_index(w, graph)
+            w_idx = vertex_index(graph, w)
             if indices[v_idx(w)] == 0 # w is un-visited
                 strongconnect(w)
                 lowlinks[v_idx] = min(lowlinks[v_idx], lowlinks[w_idx])
@@ -82,7 +82,7 @@ function strongly_connected_components_recursive{V}(graph::AbstractGraph{V})
     end
 
     for v in vertices(graph)
-        if indices[vertex_index(v, graph)] == 0
+        if indices[vertex_index(graph, v)] == 0
             strongconnect(v)
         end
     end
@@ -101,7 +101,7 @@ TarjanVisitor{V}(graph::AbstractGraph{V}) = TarjanVisitor{typeof(graph),V}(graph
         V[], Int[], zeros(Int, num_vertices(graph)), Vector{V}[])
 
 function discover_vertex!(vis::TarjanVisitor, v)
-    iv = vertex_index(v, vis.graph)
+    iv = vertex_index(vis.graph, v)
     vis.index[iv] = length(vis.stack) + 1
     push!(vis.lowlink, length(vis.stack) + 1)
     push!(vis.stack, v)
@@ -110,14 +110,14 @@ end
 
 function examine_neighbor!(vis::TarjanVisitor, v, w, w_color::Int, e_color::Int)
     if w_color == 1 # 1 means added seen, but not explored
-        while vis.index[vertex_index(w, vis.graph)] < vis.lowlink[end]
+        while vis.index[vertex_index(vis.graph, w)] < vis.lowlink[end]
             pop!(vis.lowlink)
         end
     end
 end
 
 function close_vertex!(vis::TarjanVisitor, v)
-    iv = vertex_index(v, vis.graph)
+    iv = vertex_index(vis.graph, v)
     if vis.index[iv] == vis.lowlink[end]
         component = vis.stack[vis.index[iv]:end]
         splice!(vis.stack, vis.index[iv]:length(vis.stack))
@@ -140,7 +140,7 @@ function strongly_connected_components{V}(graph::AbstractGraph{V})
     components = Array(Vector{V}, 0)
 
     for v in vertices(graph)
-        if cmap[vertex_index(v, graph)] == 0 # 0 means not visited yet
+        if cmap[vertex_index(graph, v)] == 0 # 0 means not visited yet
             visitor = TarjanVisitor(graph)
             traverse_graph(graph, DepthFirst(), v, visitor, vertexcolormap=cmap)
             for component in visitor.components

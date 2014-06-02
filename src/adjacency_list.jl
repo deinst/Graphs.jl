@@ -36,11 +36,13 @@ is_directed(g::GenericAdjacencyList) = g.is_directed
 num_vertices(g::GenericAdjacencyList) = length(g.vertices)
 vertices(g::GenericAdjacencyList) = g.vertices
 vertex_index{V<:ProvidedVertexType}(v::V, g::GenericAdjacencyList{V}) = vertex_index(v)
+vertex_index{V<:ProvidedVertexType}(g::GenericAdjacencyList{V}, v::V) = vertex_index(v)
+@deprecate vertex_index{V<:ProvidedVertexType}(v::V,g::GenericAdjacencyList{V}) vertex_index(g,v)
 
 num_edges(g::GenericAdjacencyList) = g.nedges
 
-out_degree{V}(v::V, g::GenericAdjacencyList{V}) = length(g.adjlist[vertex_index(v,g)])
-out_neighbors{V}(v::V, g::GenericAdjacencyList{V}) = g.adjlist[vertex_index(v,g)]
+out_degree{V}(v::V, g::GenericAdjacencyList{V}) = length(g.adjlist[vertex_index(g,v)])
+out_neighbors{V}(v::V, g::GenericAdjacencyList{V}) = g.adjlist[vertex_index(g,v)]
 
 
 ## mutation
@@ -54,11 +56,11 @@ add_vertex!(g::GenericAdjacencyList, x) = add_vertex!(g, make_vertex(g, x))
 
 function add_edge!{V}(g::GenericAdjacencyList{V}, u::V, v::V)
     nv::Int = num_vertices(g)    
-    iu = vertex_index(u, g)::Int
+    iu = vertex_index(g, u)::Int
     push!(g.adjlist[iu], v)
     g.nedges += 1
     if !g.is_directed
-        iv = vertex_index(v, g)::Int
+        iv = vertex_index(g, v)::Int
         push!(g.adjlist[iv], u)
     end
 end

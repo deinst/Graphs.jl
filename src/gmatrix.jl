@@ -10,18 +10,18 @@ function matrix_from_adjpairs!(a::AbstractMatrix, g::AbstractGraph, gen)
     if implements_edge_list(g)
         if is_directed(g)
             for e in edges(g)
-                u = source(e, g)
-                v = target(e, g)
-                ui = vertex_index(u, g)
-                vi = vertex_index(v, g)
+                u = source(g, e)
+                v = target(g, e)
+                ui = vertex_index(g, u)
+                vi = vertex_index(g, v)
                 a[ui, vi] = get(gen, g, u, v)
             end
         else
             for e in edges(g)
-                u = source(e, g)
-                v = target(e, g)
-                ui = vertex_index(u, g)
-                vi = vertex_index(v, g)
+                u = source(g, e)
+                v = target(g, e)
+                ui = vertex_index(g, u)
+                vi = vertex_index(g, v)
                 val = get(gen, g, u, v)
                 a[ui, vi] = val
                 a[vi, ui] = val
@@ -30,9 +30,9 @@ function matrix_from_adjpairs!(a::AbstractMatrix, g::AbstractGraph, gen)
 
     elseif implements_adjacency_list(g)
         for u in vertices(g)
-            ui = vertex_index(u, g)
+            ui = vertex_index(g, u)
             for v in out_neighbors(u, g)
-                vi = vertex_index(v, g)
+                vi = vertex_index(g, v)
                 val = get(gen, g, u, v)
                 a[ui, vi] = val
             end                
@@ -62,10 +62,10 @@ function sparse_matrix_from_adjpairs(g::AbstractGraph, gen)
     if implements_edge_list(g)
         if is_directed(g)
             for e in edges(g)
-                u = source(e, g)
-                v = target(e, g)
-                ui = vertex_index(u, g)
-                vi = vertex_index(v, g)
+                u = source(g, e)
+                v = target(g, e)
+                ui = vertex_index(g, u)
+                vi = vertex_index(g, v)
                 val = get(gen, g, u, v)
 
                 idx += 1
@@ -75,10 +75,10 @@ function sparse_matrix_from_adjpairs(g::AbstractGraph, gen)
             end
         else
             for e in edges(g)
-                u = source(e, g)
-                v = target(e, g)
-                ui = vertex_index(u, g)
-                vi = vertex_index(v, g)
+                u = source(g, e)
+                v = target(g, e)
+                ui = vertex_index(g, u)
+                vi = vertex_index(g, v)
                 val = get(gen, g, u, v)
                 
                 idx += 1
@@ -95,9 +95,9 @@ function sparse_matrix_from_adjpairs(g::AbstractGraph, gen)
 
     elseif implements_adjacency_list(g)
         for u in vertices(g)
-            ui = vertex_index(u, g)
+            ui = vertex_index(g, u)
             for v in out_neighbors(u, g)
-                vi = vertex_index(v, g)
+                vi = vertex_index(g, v)
                 val = get(gen, g, u, v)
 
                 idx += 1
@@ -119,19 +119,19 @@ function matrix_from_edges!(a::AbstractMatrix, g::AbstractGraph, gen)
     if implements_edge_list(g)
         if is_directed(g)
             for e in edges(g)
-                u = source(e, g)
-                v = target(e, g)
-                ui = vertex_index(u, g)
-                vi = vertex_index(v, g)
+                u = source(g, e)
+                v = target(g, e)
+                ui = vertex_index(g, u)
+                vi = vertex_index(g, v)
                 val = get(gen, g, e)                
                 a[ui, vi] = val
             end
         else
             for e in edges(g)
-                u = source(e, g)
-                v = target(e, g)
-                ui = vertex_index(u, g)
-                vi = vertex_index(v, g)
+                u = source(g, e)
+                v = target(g, e)
+                ui = vertex_index(g, u)
+                vi = vertex_index(g, v)
                 val = get(gen, g, e)
                 a[ui, vi] = val
                 a[vi, ui] = val
@@ -140,10 +140,10 @@ function matrix_from_edges!(a::AbstractMatrix, g::AbstractGraph, gen)
 
     elseif implements_incidence_list(g)
         for u in vertices(g)
-            ui = vertex_index(u, g)
+            ui = vertex_index(g, u)
             for e in out_edges(u, g)
-                v = target(e, g)
-                vi = vertex_index(v, g)
+                v = target(g, e)
+                vi = vertex_index(g, v)
                 val = get(gen, g, e)
                 a[ui, vi] = val
             end
@@ -172,10 +172,10 @@ function sparse_matrix_from_edges(g::AbstractGraph, gen)
     if implements_edge_list(g)
         if is_directed(g)
             for e in edges(g)
-                u = source(e, g)
-                v = target(e, g)
-                ui = vertex_index(u, g)
-                vi = vertex_index(v, g)
+                u = source(g, e)
+                v = target(g, e)
+                ui = vertex_index(g, u)
+                vi = vertex_index(g, v)
                 val = get(gen, g, e)
 
                 idx += 1
@@ -185,10 +185,10 @@ function sparse_matrix_from_edges(g::AbstractGraph, gen)
             end
         else
             for e in edges(g)
-                u = source(e, g)
-                v = target(e, g)
-                ui = vertex_index(u, g)
-                vi = vertex_index(v, g)
+                u = source(g, e)
+                v = target(g, e)
+                ui = vertex_index(g, u)
+                vi = vertex_index(g, v)
                 val = get(gen, g, e)
                 
                 idx += 1
@@ -205,10 +205,10 @@ function sparse_matrix_from_edges(g::AbstractGraph, gen)
 
     elseif implements_incidence_list(g)
         for u in vertices(g)
-            ui = vertex_index(u, g)
+            ui = vertex_index(g, u)
             for e in out_edges(u, g)
-                v = target(e, g)
-                vi = vertex_index(v, g)
+                v = target(g, e)
+                vi = vertex_index(g, v)
                 val = get(gen, g, e)
                 
                 idx += 1
@@ -292,10 +292,10 @@ function laplacian_matrix{T<:Number}(g::AbstractGraph, ::Type{T})
 
     if implements_edge_list(g)
         for e in edges(g)
-            u = source(e, g)
-            v = target(e, g)
-            ui = vertex_index(u, g)
-            vi = vertex_index(v, g)
+            u = source(g, e)
+            v = target(g, e)
+            ui = vertex_index(g, u)
+            vi = vertex_index(g, v)
             if ui != vi
                 a[ui, vi] -= 1
                 a[vi, ui] -= 1
@@ -305,9 +305,9 @@ function laplacian_matrix{T<:Number}(g::AbstractGraph, ::Type{T})
         end
     elseif implements_adjacency_list(g)
         for u in vertices(g)
-            ui = vertex_index(u, g)
+            ui = vertex_index(g, u)
             for v in out_neighbors(u, g)
-                vi = vertex_index(v, g)
+                vi = vertex_index(g, v)
                 if ui < vi
                     a[ui, vi] -= 1
                     a[vi, ui] -= 1
@@ -331,10 +331,10 @@ function laplacian_matrix{T<:Number}(g::AbstractGraph, eweights::AbstractVector{
 
     if implements_edge_list(g)
         for e in edges(g)
-            u = source(e, g)
-            v = target(e, g)
-            ui = vertex_index(u, g)
-            vi = vertex_index(v, g)
+            u = source(g, e)
+            v = target(g, e)
+            ui = vertex_index(g, u)
+            vi = vertex_index(g, v)
             if ui != vi
                 wi = eweights[edge_index(e, g)]
                 a[ui, vi] -= wi
@@ -345,10 +345,10 @@ function laplacian_matrix{T<:Number}(g::AbstractGraph, eweights::AbstractVector{
         end
     else
         for u in vertices(g)
-            ui = vertex_index(u, g)
+            ui = vertex_index(g, u)
             for e in out_edges(u, g)
-                v = target(e, g)
-                vi = vertex_index(v, g)
+                v = target(g, e)
+                vi = vertex_index(g, v)
                 if ui < vi
                     wi = eweights[edge_index(e, g)]
                     a[ui, vi] -= wi
@@ -382,10 +382,10 @@ function laplacian_matrix_sparse{T<:Number}(g::AbstractGraph, ::Type{T})
 
     if implements_edge_list(g)
         for e in edges(g)
-            u = source(e, g)
-            v = target(e, g)
-            ui = vertex_index(u, g)
-            vi = vertex_index(v, g)
+            u = source(g, e)
+            v = target(g, e)
+            ui = vertex_index(g, u)
+            vi = vertex_index(g, v)
             if ui != vi
                 idx += 1
                 I[idx] = ui 
@@ -403,9 +403,9 @@ function laplacian_matrix_sparse{T<:Number}(g::AbstractGraph, ::Type{T})
         end
     elseif implements_adjacency_list(g)
         for u in vertices(g)
-            ui = vertex_index(u, g)
+            ui = vertex_index(g, u)
             for v in out_neighbors(u, g)
-                vi = vertex_index(v, g)
+                vi = vertex_index(g, v)
                 if ui < vi
                     idx += 1
                     I[idx] = ui 
@@ -462,10 +462,10 @@ function laplacian_matrix_sparse{T<:Number}(g::AbstractGraph, eweights::Abstract
 
     if implements_edge_list(g)
         for e in edges(g)
-            u = source(e, g)
-            v = target(e, g)
-            ui = vertex_index(u, g)
-            vi = vertex_index(v, g)
+            u = source(g, e)
+            v = target(g, e)
+            ui = vertex_index(g, u)
+            vi = vertex_index(g, v)
             if ui != vi
                 wi = eweights[edge_index(e, g)]
                 idx += 1
@@ -484,10 +484,10 @@ function laplacian_matrix_sparse{T<:Number}(g::AbstractGraph, eweights::Abstract
         end
     elseif implements_adjacency_list(g)
         for u in vertices(g)
-            ui = vertex_index(u, g)
+            ui = vertex_index(g, u)
             for e in out_edges(u, g)
-                v = target(e, g)
-                vi = vertex_index(v, g)
+                v = target(g, e)
+                vi = vertex_index(g, v)
                 if ui < vi
                     wi = eweights[edge_index(e, g)]
                     idx += 1

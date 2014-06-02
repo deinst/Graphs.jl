@@ -30,17 +30,31 @@ end
 make_vertex(g::AbstractGraph{ExVertex}, label::String) = ExVertex(num_vertices(g) + 1, utf8(label))
 vertex_index(v::ExVertex) = v.index
 attributes(v::ExVertex, g::AbstractGraph) = v.attributes
+attributes(g::AbstractGraph, v::ExVertex) = v.attributes
+@deprecate attributes(v::ExVertex, g::AbstractGraph) attributes(g,v)
 
 typealias ProvidedVertexType Union(Integer, KeyVertex, ExVertex)
 
-# vertex_index for (V !<: ProvidedVertexType)
+#Fixme I'm evil
+vertex_index{V,E}(a::AbstractGraph{V,E},b::AbstractGraph{V,E}) = nothing
+vertex_index{T,N,E}(a::AbstractGraph{AbstractArray{T,N},E},b::AbstractArray{T,N}) = nothing
 
+# vertex_index for (V !<: ProvidedVertexType)
 function vertex_index{V}(v::V, g::AbstractGraph{V})
     @graph_requires g vertex_list
-    return vertex_index(v, vertices(g))
+    return vertex_index(vertices(g), v)
 end
 
-vertex_index(v, vs::AbstractArray) = findfirst(vs, v)
+function vertex_index{V}(g::AbstractGraph{V}, v::V)
+    @graph_requires g vertex_list
+    return findfirst(vertices(g), v) 
+#FIXME
+#    return vertex_index(vertices(g), v)
+end
+
+@deprecate vertex_index{V}(v::V,g::AbstractGraph{V}) vertex_index(g,v)
+ 
+#vertex_index(v, vs::AbstractArray) = findfirst(vs, v)
 
 
 #################################################
@@ -67,6 +81,11 @@ target(e::Edge) = e.target
 source{V}(e::Edge{V}, g::AbstractGraph{V}) = e.source
 target{V}(e::Edge{V}, g::AbstractGraph{V}) = e.target
 
+source{V}(g::AbstractGraph{V}, e::Edge{V}) = e.source
+target{V}(g::AbstractGraph{V}, e::Edge{V}) = e.target
+@deprecate source{V}(e::Edge{V},g::AbstractGraph{V}) source(g,e)
+@deprecate target{V}(e::Edge{V},g::AbstractGraph{V}) source(g,e)
+
 type ExEdge{V}
     index::Int
     source::V
@@ -91,6 +110,13 @@ source{V}(e::ExEdge{V}, g::AbstractGraph{V}) = e.source
 target{V}(e::ExEdge{V}, g::AbstractGraph{V}) = e.target
 attributes(e::ExEdge, g::AbstractGraph) = e.attributes
 
+source{V}(g::AbstractGraph{V}, e::ExEdge{V}) = e.source
+target{V}(g::AbstractGraph{V}, e::ExEdge{V}) = e.target
+attributes(g::AbstractGraph, e::ExEdge) = e.attributes
+
+@deprecate source{V}(e::ExEdge{V},g::AbstractGraph{V})  source(g,e)
+@deprecate target{V}(e::ExEdge{V},g::AbstractGraph{V})  target(g,e)
+@deprecate attributes(e::ExEdge,g::AbstractGraph)  attributes(g,e)
 
 #################################################
 #
@@ -128,11 +154,11 @@ TargetIterator{G<:AbstractGraph,EList}(g::G, lst::EList) =
 
 length(a::TargetIterator) = length(a.lst)
 isempty(a::TargetIterator) = isempty(a.lst)
-getindex(a::TargetIterator, i::Integer) = target(a.lst[i], a.g)
+getindex(a::TargetIterator, i::Integer) = target(a.g, a.lst[i])
 
 start(a::TargetIterator) = start(a.lst)
 done(a::TargetIterator, s) = done(a.lst, s)
-next(a::TargetIterator, s::Int) = ((e, s) = next(a.lst, s); (target(e, a.g), s))
+next(a::TargetIterator, s::Int) = ((e, s) = next(a.lst, s); (target(a.g, e), s))
 
 # iterating over sources
 
@@ -146,11 +172,11 @@ SourceIterator{G<:AbstractGraph,EList}(g::G, lst::EList) =
 
 length(a::SourceIterator) = length(a.lst)
 isempty(a::SourceIterator) = isempty(a.lst)
-getindex(a::SourceIterator, i::Integer) = source(a.lst[i], a.g)
+getindex(a::SourceIterator, i::Integer) = source(a.g, a.lst[i])
 
 start(a::SourceIterator) = start(a.lst)
 done(a::SourceIterator, s) = done(a.lst, s)
-next(a::SourceIterator, s::Int) = ((e, s) = next(a.lst, s); (source(e, a.g), s))
+next(a::SourceIterator, s::Int) = ((e, s) = next(a.lst, s); (source(a.g, e), s))
 
 #################################################
 #

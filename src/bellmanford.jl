@@ -35,7 +35,7 @@ function bellman_ford_shortest_paths!{V,D}(
 
     active = Set{V}()
     for v in sources
-        i = vertex_index(v, graph)
+        i = vertex_index(graph, v)
         state.dists[i] = 0
         state.parents[i] = v
         push!(active, v)
@@ -45,10 +45,10 @@ function bellman_ford_shortest_paths!{V,D}(
         no_changes = true
         new_active = Set{V}()
         for u in active
-            uind = vertex_index(u, graph)
+            uind = vertex_index(graph, u)
             for e in out_edges(u, graph)
-                v = target(e, graph)
-                vind = vertex_index(v, graph)
+                v = target(graph,e)
+                vind = vertex_index(graph, v)
                 edist = edge_property(edge_dists, e, graph)
                 if state.dists[vind] > state.dists[uind] + edist
                     state.dists[vind] = state.dists[uind] + edist

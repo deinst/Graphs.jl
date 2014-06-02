@@ -137,8 +137,8 @@ function process_neighbors!{V,E,W,Heap,H}(
     ew::W = zero(W)
 
     for e in out_edges(u, graph)
-        v = target(e, graph)
-        vi = vertex_index(v, graph)
+        v = target(graph, e)
+        vi = vertex_index(graph, v)
         v_color = colormap[vi]
 
         if v_color == 0
@@ -177,7 +177,7 @@ function prim_minimum_spantree!{V,E,W,Heap,H}(
 
     # initialize
 
-    root_idx = vertex_index(root, graph)
+    root_idx = vertex_index(graph, root)
     state.parents[root_idx] = root
     state.colormap[root_idx] = 2
 
@@ -194,7 +194,7 @@ function prim_minimum_spantree!{V,E,W,Heap,H}(
         e::E = entry.edge
         w::W = entry.weight
 
-        state.colormap[vertex_index(v, graph)] = 2
+        state.colormap[vertex_index(graph, v)] = 2
         if !include_vertex!(visitor, v, e, w)
             return
         end

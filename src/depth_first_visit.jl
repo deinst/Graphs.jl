@@ -24,7 +24,7 @@ function depth_first_visit_impl!{V,E}(
         while !done(uegs, tstate) && !found_new_vertex
             v_edge, tstate = next(uegs, tstate)
             v = v_edge.target
-            v_color = vertexcolormap[vertex_index(v, graph)]
+            v_color = vertexcolormap[vertex_index(graph, v)]
             e_color = edgecolormap[edge_index(v_edge, graph)]
             examine_neighbor!(visitor, u, v, v_color, e_color)
 
@@ -34,7 +34,7 @@ function depth_first_visit_impl!{V,E}(
 
             if v_color == 0
                 found_new_vertex = true
-                vertexcolormap[vertex_index(v, graph)] = 1
+                vertexcolormap[vertex_index(graph, v)] = 1
                 if !discover_vertex!(visitor, v)
                     return
                 end
@@ -48,7 +48,7 @@ function depth_first_visit_impl!{V,E}(
 
         if !found_new_vertex
             close_vertex!(visitor, u)
-            vertexcolormap[vertex_index(u, graph)] = 2
+            vertexcolormap[vertex_index(graph, u)] = 2
         end
     end
 end
@@ -63,7 +63,7 @@ function traverse_graph{V,G <: AbstractGraph}(
 
     @graph_requires graph incidence_list vertex_map
 
-    vertexcolormap[vertex_index(s, graph)] = 1
+    vertexcolormap[vertex_index(graph, s)] = 1
     if !discover_vertex!(visitor, s)
         return
     end
@@ -111,7 +111,7 @@ function test_cyclic_by_dfs{G <: AbstractGraph}(graph::G)
     visitor = DFSCyclicTestVisitor()
 
     for s in vertices(graph)
-        if cmap[vertex_index(s, graph)] == 0
+        if cmap[vertex_index(graph, s)] == 0
             traverse_graph(graph, DepthFirst(), s, visitor, vertexcolormap=cmap)
         end
 
@@ -152,7 +152,7 @@ function topological_sort_by_dfs{V}(graph::AbstractGraph{V})
     visitor = TopologicalSortVisitor{V}(num_vertices(graph))
 
     for s in vertices(graph)
-        if cmap[vertex_index(s, graph)] == 0
+        if cmap[vertex_index(graph, s)] == 0
             traverse_graph(graph, DepthFirst(), s, visitor, vertexcolormap=cmap)
         end
     end

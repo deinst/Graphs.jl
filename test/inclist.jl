@@ -180,12 +180,12 @@ let
 	@test out_degree(vs[3], g) == 2
 
 	e1 = out_edges(vs[1], g)[1]
-	@test source(e1, g) == vs[1]
-	@test target(e1, g) == vs[2]
+	@test source(g, e1) == vs[1]
+	@test target(g, e1) == vs[2]
 
 	e2 = out_edges(vs[2], g)[1]
-	@test source(e2, g) == vs[2]
-	@test target(e2, g) == vs[1]
+	@test source(g, e2) == vs[2]
+	@test target(g, e2) == vs[1]
 
 	@test edge_index(e1, g) == edge_index(e2, g)
 end

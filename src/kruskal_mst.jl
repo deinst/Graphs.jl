@@ -23,8 +23,8 @@ function kruskal_select{V,E,W}(
                         
         for we in sorted_wedges
             e::E = we.edge            
-            ui = vertex_index(source(e, graph), graph)
-            vi = vertex_index(target(e, graph), graph)
+            ui = vertex_index(graph, source(graph, e))
+            vi = vertex_index(graph, target(graph, e))
         
             if !in_same_set(dsets, ui, vi)
                 union!(dsets, ui, vi)

@@ -13,7 +13,7 @@ tests = [
     "a_star_spath",
     "mst",
     "floyd",
-    "dot",
+#    "dot",
     "cliques",
     "random" ]
 

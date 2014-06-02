@@ -14,7 +14,7 @@ let g=inclist(ExVertex, is_directed=false)
     add_vertex!(g, ExVertex(1, "label1"))
     add_vertex!(g, ExVertex(2, "label2"))
     add_edge!(g, vertices(g)[1], vertices(g)[2])
-    attrs = attributes(vertices(g)[1], g)
+    attrs = attributes(g, vertices(g)[1])
 
     @test to_dot(attrs) == ""
 
@@ -42,7 +42,7 @@ let
 
     e = out_edges(vertices(g)[2], g)[1]
 
-    attrs = attributes(e, g)
+    attrs = attributes(g, e)
     attrs["foo"] = "bar"
     @test to_dot(attrs) == "[\"foo\"=\"bar\"]"
 

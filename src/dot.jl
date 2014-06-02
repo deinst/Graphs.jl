@@ -19,29 +19,29 @@ end
 
 # Write the dot representation of a graph to a stream.
 function to_dot{G<:AbstractGraph}(graph::G, stream::IO)
-    has_vertex_attrs = method_exists(attributes, (vertex_type(graph), G))
-    has_edge_attrs = method_exists(attributes, (edge_type(graph), G))
+    has_vertex_attrs = method_exists(attributes, (G, vertex_type(graph)))
+    has_edge_attrs = method_exists(attributes, (G, edge_type(graph)))
 
     write(stream, "$(graph_type_string(graph)) graphname {\n")
     if implements_edge_list(graph)
         for edge in edges(graph)
-            write(stream,"$(vertex_index(source(edge), graph)) $(edge_op(graph)) $(vertex_index(target(edge), graph))\n")
+            write(stream,"$(vertex_index(graph, source(edge))) $(edge_op(graph)) $(vertex_index(graph, target(edge)))\n")
         end
     elseif implements_vertex_list(graph) && (implements_incidence_list(graph) || implements_adjacency_list(graph))
         for vertex in vertices(graph)
-            if has_vertex_attrs && !isempty(attributes(vertex, graph))
-                write(stream, "$(vertex_index(vertex, graph)) $(to_dot(attributes(vertex, graph)))\n")
+            if has_vertex_attrs && !isempty(attributes(graph, vertex))
+                write(stream, "$(vertex_index(graph, vertex)) $(to_dot(attributes(graph, vertex)))\n")
             end
             if implements_incidence_list(graph)
                 for e in out_edges(vertex, graph)
-                    n = target(e, graph)
-                    if is_directed(graph) || vertex_index(n, graph) > vertex_index(vertex, graph)
-                        write(stream,"$(vertex_index(vertex, graph)) $(edge_op(graph)) $(vertex_index(n, graph))$(has_edge_attrs ? string(" ", to_dot(attributes(e, graph))) : "")\n")
+                    n = target(graph, e)
+                    if is_directed(graph) || vertex_index(graph, n) > vertex_index(graph, vertex)
+                        write(stream,"$(vertex_index(graph, vertex)) $(edge_op(graph)) $(vertex_index(graph, n))$(has_edge_attrs ? string(" ", to_dot(attributes(e, graph))) : "")\n")
                     end
                 end
             else # implements_adjacency_list
-                for n in out_neighbors(vertex, graph)
-                    if is_directed(graph) || vertex_index(n, graph) > vertex_index(vertex, graph)
+                for n in out_neighbors(graph, vertex)
+                    if is_directed(graph) || vertex_index(graph, n) > vertex_index(graph, vertex)
                         write(stream,"$(vertex_index(vertex, graph)) $(edge_op(graph)) $(vertex_index(n))\n")
                     end
                 end
@@ -50,7 +50,7 @@ function to_dot{G<:AbstractGraph}(graph::G, stream::IO)
     else
         throw(ArgumentError("More graph Concepts needed: dot serialization requires iteration over edges or iteration over vertices and neighbors."))
     end
-    write(stream, "}\n")
+    write("}\n", stream)
     stream
 end
 
